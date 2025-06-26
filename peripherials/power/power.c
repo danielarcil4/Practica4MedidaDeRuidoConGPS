@@ -1,8 +1,9 @@
 #include "power.h"
 
+
 void enter_sleep_mode() {
     // SLEEP o DORMANT
-    __wfi(); // Wait for Interrupt (low power standby)
+    //__wfi(); // Wait for Interrupt (low power standby)
 }
 
 void wake_from_sleep() {

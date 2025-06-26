@@ -10,7 +10,7 @@ typedef struct {
 	void *i2c_handle;
 }plataform_t;
 
-plataform_t my_i2c_init(i2c_inst_t *i2c_handle, uint32_t frequency);
+plataform_t my_i2c_init(void);
 
 int my_i2c_write_blocking(void *i2c_handle, uint8_t addr, const uint8_t *src, size_t len);
 

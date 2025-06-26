@@ -7,38 +7,45 @@
 #define BUTTON_PIN      14
 #define DEBOUNCE_DELAY  50  // ms
 
+// Prototipo de la función de callback
+static void _button_callback(uint gpio, uint32_t events);
+static bool _button_timer_callback(repeating_timer_t *rt);
+
 // Estado interno del botón
-static volatile bool button_irq_flag = false;     // IRQ activada
+static repeating_timer_t debounce_timer;
+static volatile bool debounce_timer_active = false;
+static volatile bool button_irq_flag = false;     // IRQ 
 static volatile bool button_valid_press = false;  // flanco confirmado
 static volatile uint8_t debounce_counter = 0;
-
-void button_callback(uint32_t events) {
-    if (events & GPIO_IRQ_EDGE_FALL) {
-        button_irq_flag = true;
-        debounce_counter = 0; // empieza conteo de debounce
-    }
-}
 
 void init_button(void) {
     gpio_init(BUTTON_PIN);
     gpio_set_dir(BUTTON_PIN, GPIO_IN);
-    gpio_pull_down(BUTTON_PIN);  
+    gpio_pull_up(BUTTON_PIN);  
 
-    gpio_set_irq_enabled_with_callback(BUTTON_PIN, GPIO_IRQ_EDGE_FALL, true, &button_gpio_callback);
+    gpio_set_irq_enabled_with_callback(BUTTON_PIN, GPIO_IRQ_EDGE_RISE, true, _button_callback);
 }
 
-// Esta función debe llamarse cada 1ms desde un timer IRQ
-void button_timer_irq_handler(void) {
-    if (button_irq_flag) {
-        debounce_counter++;
-
-        if (debounce_counter >= DEBOUNCE_DELAY) {
-            if (gpio_get(BUTTON_PIN)) { 
-                button_valid_press = true;
-            }
-            button_irq_flag = false;
-        }
+static void _button_callback(uint gpio, uint32_t events) {
+    if ((events & GPIO_IRQ_EDGE_RISE) && !debounce_timer_active) {
+        debounce_counter = 0;
+        debounce_timer_active = true;
+        // Inicia el timer de 1 ms
+        add_repeating_timer_ms(-1, _button_timer_callback, NULL, &debounce_timer);
     }
+}
+
+static bool _button_timer_callback(repeating_timer_t *rt) {
+    debounce_counter++;
+    if (debounce_counter >= DEBOUNCE_DELAY) {
+        if (!gpio_get(BUTTON_PIN)) { 
+            button_valid_press = true;
+        }
+        debounce_timer_active = false;
+        cancel_repeating_timer(rt);
+        return false;  // Detiene el timer
+    }
+    return true;  // Mantiene el timer activo
 }
 
 bool button_pressed(void) {
@@ -48,3 +55,4 @@ bool button_pressed(void) {
     }
     return false;
 }
+

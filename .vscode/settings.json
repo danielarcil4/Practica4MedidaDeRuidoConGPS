@@ -46,6 +46,10 @@
         "stdio.h": "c",
         "states_funtions.h": "c",
         "led.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "stdbool.h": "c",
+        "gpio.h": "c",
+        "uart.h": "c",
+        "power.h": "c"
     }
 }

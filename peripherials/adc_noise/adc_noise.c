@@ -1,10 +1,15 @@
 #include "adc_noise.h"
 #include "hardware/adc.h"
+#include <math.h>
+#include <unistd.h>
 
-void my_adc_init(uint8_t gpio_pin, uint8_t adc_channel) {
+#define ADC             26
+#define ADC_CHANNEL     0 // ADC0 corresponds to GPIO26
+
+void my_adc_init() {
     adc_init();
-    adc_gpio_init(gpio_pin);
-    adc_select_input(adc_channel);
+    adc_gpio_init(ADC);
+    adc_select_input(ADC_CHANNEL);
 }
 
 float measure_noise() {

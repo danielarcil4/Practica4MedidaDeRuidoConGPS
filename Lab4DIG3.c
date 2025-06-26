@@ -10,23 +10,6 @@
 #include "peripherials/gps_driver/gps_driver.h"
 #include "peripherials/eeprom_i2c/i2c.h"
 
-#define YELLOW_LED      10
-#define GREEN_LED       11
-#define ORANGE_LED      12
-#define RED_LED         13
-#define BUTTON          14
-
-#define SDA             0
-#define SCL             1
-#define I2C_HANDLE      i2c0 // Use i2c0 as the I2C handle
-#define ADC             26
-#define ADC_CHANNEL     0 // ADC0 corresponds to GPIO26
-
-#define ON              1
-#define OFF             0
-
-bool button_pressed = false;
-
 void initialize_all_peripherials(void);
 
 void button_isr_gpio(void);
@@ -58,9 +41,7 @@ int main()
     initialize_all_peripherials();
 
     while(1){
-        if(button_pressed){
-            button_pressed = false;
-
+        if(button_pressed()){
             measure_noise();
         }
     }
@@ -69,35 +50,22 @@ int main()
 void initialize_all_peripherials(){
     // Initialize the terminal
     init_terminal();
-    // Initialize the power management
-    init_power();
-    // Initialize the button
-    button_init(BUTTON, GPIO_IN);
-    
     // Initialize the GPS
-    init_gps(uart0, 4, 5); // Initialize GPS on UART0 with TX on GPIO4 and RX on GPIO5
-    // Initialize the EEPROM I2C interface
-    
+    init_gps(); 
+    // Initialize button with GPIO and IRQ
+    init_button(); 
 
     // Initialize the LEDs
-    led_init(GREEN_LED, GPIO_OUT);
-    led_init(ORANGE_LED, GPIO_OUT);
-    led_init(RED_LED, GPIO_OUT);
-    led_init(YELLOW_LED, GPIO_OUT);
+    leds_init();
 
     // Initialize the ADC
-    my_adc_init(ADC, ADC_CHANNEL); // Initialize ADC on GPIO26 (ADC0)
+    my_adc_init(); // Initialize ADC on GPIO26 (ADC0)
 
     // Initialize the I2C interface
-    plataform_t i2c_handler = my_i2c_init(I2C_HANDLE, 40000); // Initialize I2C with 40kHz frequency
+    plataform_t i2c_handler = my_i2c_init(); // Initialize I2C with 40kHz frequency
 }
 
 /************************************************************STATE_FUNTIONS*******************************************************************/
-
-static void button_isr_gpio(void)
-{
-	button_pressed = true;
-}
 
 void state_wait_gps() {
     if (gps_has_fix()) {
@@ -116,7 +84,7 @@ void state_idle() {
         return;
     }
 
-    if (button_pressed()) {
+    if (button_pressed) {
         current_state = state_measuring;
         return;
     }
@@ -136,7 +104,7 @@ void state_measuring() {
         return;
     }
 
-    if (button_pressed()) {
+    if (button_pressed) {
         error_flag = true;
         current_state = state_error;
         return;
