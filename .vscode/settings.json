@@ -40,6 +40,12 @@
     "files.associations": {
         "i2c.h": "c",
         "stdint.h": "c",
-        "adc.h": "c"
+        "adc.h": "c",
+        "adc_noise.h": "c",
+        "terminal.h": "c",
+        "stdio.h": "c",
+        "states_funtions.h": "c",
+        "led.h": "c",
+        "stdlib.h": "c"
     }
 }

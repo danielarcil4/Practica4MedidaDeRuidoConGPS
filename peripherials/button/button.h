@@ -1,11 +1,14 @@
 #ifndef __BUTTON_H__
 #define __BUTTON_H__
-#include <stdint.h>
-#include "hardware/irq.h"
-#include "hardware/gpio.h"
 
-void button_init(uint8_t gpio_pin, uint8_t gpio_dir);
-void button_set_callback(uint gpio_button, uint32_t event_mask, bool enabled, gpio_irq_callback_t callback);
 
+// Inicializa el botón (GPIO, interrupción o timer si es necesario)
+void init_button(void);
+
+// Llama periódicamente en el loop principal o por timer para hacer debounce
+void button_update(void);
+
+// Devuelve true si el botón fue presionado (flanco descendente)
+void button_pressed(void);
 
 #endif // __BUTTON_H__
