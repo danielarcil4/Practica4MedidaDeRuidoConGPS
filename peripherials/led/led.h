@@ -13,5 +13,6 @@
 void leds_init(void);
 void set_led(uint8_t led, uint8_t state);
 void blink_led(uint8_t led, uint32_t times);
+void stop_blink_led(uint8_t led);
 
 #endif // __LED_H__

@@ -50,6 +50,7 @@
         "stdbool.h": "c",
         "gpio.h": "c",
         "uart.h": "c",
-        "power.h": "c"
+        "power.h": "c",
+        "gps_driver.h": "c"
     }
 }
