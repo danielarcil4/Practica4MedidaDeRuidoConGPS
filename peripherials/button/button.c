@@ -16,7 +16,6 @@ static repeating_timer_t debounce_timer;
 static volatile bool debounce_timer_active = false;
 static volatile bool button_irq_flag = false;     // IRQ 
 static volatile bool button_valid_press = false;  // flanco confirmado
-static volatile uint8_t debounce_counter = 0;
 
 void init_button(void) {
     gpio_init(BUTTON_PIN);
@@ -27,22 +26,15 @@ void init_button(void) {
 }
 
 static void _button_callback(uint gpio, uint32_t events) {
-    if ((events & GPIO_IRQ_EDGE_RISE) && !debounce_timer_active) {
-        debounce_counter = 0;
-        debounce_timer_active = true;
-        // Inicia el timer de 1 ms
-        add_repeating_timer_ms(-1, _button_timer_callback, NULL, &debounce_timer);
+    if (events & GPIO_IRQ_EDGE_RISE) {
+        // Inicia el timer de DEBOUNCE_DELAY ms
+        add_repeating_timer_ms(DEBOUNCE_DELAY, _button_timer_callback, NULL, &debounce_timer);
     }
 }
 
 static bool _button_timer_callback(repeating_timer_t *rt) {
-    debounce_counter++;
-    if (debounce_counter >= DEBOUNCE_DELAY) {
-        if (!gpio_get(BUTTON_PIN)) { 
-            button_valid_press = true;
-        }
-        debounce_timer_active = false;
-        cancel_repeating_timer(rt);
+    if (!gpio_get(BUTTON_PIN)) { 
+        button_valid_press = true;
         return false;  // Detiene el timer
     }
     return true;  // Mantiene el timer activo

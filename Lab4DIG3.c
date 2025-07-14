@@ -8,11 +8,9 @@
 #include "peripherials/terminal/terminal.h"
 #include "peripherials/adc_noise/adc_noise.h"
 #include "peripherials/gps_driver/gps_driver.h"
-#include "peripherials/eeprom_i2c/i2c.h"
+#include "peripherials/memory_driver/memory_driver.h"
 
 void initialize_all_peripherials(void);
-
-void button_isr_gpio(void);
 
 // Function prototypes for state functions
 typedef void(*state_func_t)(void);
@@ -33,40 +31,63 @@ bool error_flag = false;
 int main()
 {
     stdio_init_all();
-
     // Wait some time for USB serial connection
 	sleep_ms(3000);
 
     // Initialize all peripherals
     initialize_all_peripherials();
 
+    // Prueba de escritura y lectura
+    eeprom_write_byte(0x002A, 0x5A); // Escribe 0x5A en 0x002A
+    uint8_t value;
+    if (eeprom_read_byte(0x002A, &value)) {
+        printf("Leído: 0x%02X\n", value);
+    } else {
+        printf("Error de lectura\n");
+    }
+
+    // Escribir una página
+    uint8_t page[4] = {0x11, 0x22, 0x33, 0x44};
+    eeprom_write_page(0x0030, page, 4);
+
+    uint8_t read_back[4];
+    eeprom_read_data(0x0030, read_back, 4);
+
+    for (int i = 0; i < 4; i++) {
+        printf("Byte %d: 0x%02X\n", i, read_back[i]);
+    }
+
     while(1){
+        /*
         if(button_pressed()){
-            measure_noise();
+            current_state = state_measuring;
         }
+        */
     }
 }
 
 void initialize_all_peripherials(){
     // Initialize the terminal
-    init_terminal();
+    //init_terminal();
     // Initialize the GPS
-    init_gps(); 
+    //init_gps(); 
     // Initialize button with GPIO and IRQ
-    init_button(); 
+    //init_button(); 
 
     // Initialize the LEDs
-    leds_init();
+    //leds_init();
 
     // Initialize the ADC
-    my_adc_init(); // Initialize ADC on GPIO26 (ADC0)
+    //my_adc_init(); // Initialize ADC on GPIO26 (ADC0)
 
     // Initialize the I2C interface
-    plataform_t i2c_handler = my_i2c_init(); // Initialize I2C with 40kHz frequency
+    //plataform_t i2c_handler = my_i2c_init(); // Initialize I2C with 40kHz frequency
+    // Initialize the EEPROM
+    eeprom_init(); // Initialize EEPROM with I2C port and SDA/SCL pins
 }
 
 /************************************************************STATE_FUNTIONS*******************************************************************/
-
+/*
 void state_wait_gps() {
     if (gps_has_fix()) {
         set_led(GREEN_LED, ON);
@@ -150,3 +171,4 @@ void state_terminal() {
     handle_terminal();  // DUMP
     current_state = gps_has_fix() ? state_idle : state_wait_gps;
 }
+*/

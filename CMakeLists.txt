@@ -38,13 +38,11 @@ pico_sdk_init()
 add_executable(Lab4DIG3 Lab4DIG3.c 
                         peripherials/button/button.c
                         peripherials/led/led.c
-                        peripherials/eeprom_i2c/i2c.c
                         peripherials/gps_driver/gps_driver.c
                         peripherials/memory_driver/memory_driver.c
                         peripherials/adc_noise/adc_noise.c
                         peripherials/power/power.c
-                        peripherials/terminal/terminal.c
-                        timers/time_base.c)
+                        peripherials/terminal/terminal.c)
 
 pico_set_program_name(Lab4DIG3 "Lab4DIG3")
 pico_set_program_version(Lab4DIG3 "0.1")
