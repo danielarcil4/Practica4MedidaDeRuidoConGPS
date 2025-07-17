@@ -19,29 +19,29 @@ void eeprom_init() {
     gpio_pull_up(SCL_PIN);
 }
 
-static uint8_t eeprom_get_control_byte(uint8_t mem_addr, bool read) {
+static uint8_t eeprom_get_control_byte(uint8_t mem_addr) {
     uint8_t block = mem_addr / EEPROM_BLOCK_SIZE;
-    printf("Control byte: %02X, Block: %d, Read: %d\n", (SLAVE_ADD << 3) , (block << 1) , (read ? 1 : 0));
-    return  ((SLAVE_ADD<<3) | (block << 1) | (read ? 1 : 0));
+    //printf("Control byte: %02X, Block: %d, Read: %d\n", (SLAVE_ADD << 4) , (block << 1));
+    return  ((SLAVE_ADD<<3) | (block));
 }
 
 bool eeprom_write_byte(uint16_t mem_addr, uint8_t data) {
-    uint8_t control = eeprom_get_control_byte(mem_addr, false);
+    uint8_t control = eeprom_get_control_byte(mem_addr);
     uint8_t addr = mem_addr % EEPROM_BLOCK_SIZE;
     uint8_t buf[2] = {addr, data};
 
     //print control
-    printf("Control byte: 0x%02X, Addr: 0x%02X, Data: 0x%02X\n", control, addr, data);
+    //printf("Control byte: 0x%02X, Addr: 0x%02X, Data: 0x%02X\n", control, addr, data);
 
     int ret = i2c_write_blocking(i2c_eeprom, control, buf, 2, false);
-    sleep_ms(10); // tiempo de escritura típico
+    sleep_ms(5); // tiempo de escritura típico
     return ret == 2;
 }
 
 bool eeprom_write_page(uint16_t mem_addr, const uint8_t *data, uint8_t len) {
     if (len > EEPROM_PAGE_SIZE) return false;
 
-    uint8_t control = eeprom_get_control_byte(mem_addr, false);
+    uint8_t control = eeprom_get_control_byte(mem_addr);
     uint8_t addr = mem_addr % EEPROM_BLOCK_SIZE;
 
     uint8_t buf[1 + EEPROM_PAGE_SIZE];
@@ -50,13 +50,13 @@ bool eeprom_write_page(uint16_t mem_addr, const uint8_t *data, uint8_t len) {
         buf[i + 1] = data[i];
 
     int ret = i2c_write_blocking(i2c_eeprom, control, buf, len + 1, false);
-    sleep_ms(10);
+    sleep_ms(5);
     return ret == len + 1;
 }
 
 bool eeprom_read_byte(uint16_t mem_addr, uint8_t *data) {
-    uint8_t control_w = eeprom_get_control_byte(mem_addr, false);
-    uint8_t control_r = eeprom_get_control_byte(mem_addr, true);
+    uint8_t control_w = eeprom_get_control_byte(mem_addr);
+    uint8_t control_r = eeprom_get_control_byte(mem_addr);
     uint8_t addr = mem_addr % EEPROM_BLOCK_SIZE;
 
     int ret = i2c_write_blocking(i2c_eeprom, control_w, &addr, 1, true);
@@ -67,8 +67,8 @@ bool eeprom_read_byte(uint16_t mem_addr, uint8_t *data) {
 }
 
 bool eeprom_read_data(uint16_t mem_addr, uint8_t *buffer, uint8_t len) {
-    uint8_t control_w = eeprom_get_control_byte(mem_addr, false);
-    uint8_t control_r = eeprom_get_control_byte(mem_addr, true);
+    uint8_t control_w = eeprom_get_control_byte(mem_addr);
+    uint8_t control_r = eeprom_get_control_byte(mem_addr);
     uint8_t addr = mem_addr % EEPROM_BLOCK_SIZE;
 
     int ret = i2c_write_blocking(i2c_eeprom, control_w, &addr, 1, true);

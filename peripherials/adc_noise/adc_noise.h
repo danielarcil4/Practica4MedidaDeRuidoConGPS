@@ -2,14 +2,17 @@
 #define __ADC_NOISE_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef struct {
-    uint32_t count;
-    uint32_t sum;
+    uint8_t count;
+    float sum;
+    float intensidad;
+    bool data_ready;
 } adc_acc_t;
 
 // Function to read the ADC value from a specified channel
 void my_adc_init(void);
-float measure_noise(void);
+void measure_noise(adc_acc_t *adc);
 
 #endif // __ADC_NOISE_H
