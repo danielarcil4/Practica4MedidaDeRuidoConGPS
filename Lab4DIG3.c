@@ -28,6 +28,8 @@ float last_noise_db = 0.0;
 gps_data_t last_location;
 bool error_flag = false;
 
+void test_memory(void);
+
 int main()
 {
     stdio_init_all();
@@ -37,8 +39,29 @@ int main()
     // Initialize all peripherals
     initialize_all_peripherials();
 
+    /**
+     * TODO: Delete the following code
+     */
+
+    test_memory();
+    //******************************* */
+
+    while(1){
+        /*
+        if(button_pressed()){
+            current_state = state_measuring;
+        }
+        */
+    }
+}
+
+void test_memory() {
     // Prueba de escritura y lectura
-    eeprom_write_byte(0x002A, 0x5A); // Escribe 0x5A en 0x002A
+    if(eeprom_write_byte(0x002A, 0x5A)){
+        printf("Escritura exitosa\n");
+    } else {
+        printf("Error de escritura\n");
+    } // Escribe 0x5A en 0x002A
     uint8_t value;
     if (eeprom_read_byte(0x002A, &value)) {
         printf("Leído: 0x%02X\n", value);
@@ -55,14 +78,6 @@ int main()
 
     for (int i = 0; i < 4; i++) {
         printf("Byte %d: 0x%02X\n", i, read_back[i]);
-    }
-
-    while(1){
-        /*
-        if(button_pressed()){
-            current_state = state_measuring;
-        }
-        */
     }
 }
 

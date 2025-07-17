@@ -1,7 +1,9 @@
 #include "peripherials/memory_driver/memory_driver.h"
 #include "pico/stdlib.h"
 
-#define I2C_DEFAULT_PORT i2c0
+#include <stdio.h>
+
+#define I2C_MEMORY_PORT i2c0
 #define SDA_PIN 4
 #define SCL_PIN 5
 #define I2C_FREQUENCY 100000 // 100kHz
@@ -9,8 +11,8 @@
 static i2c_inst_t *i2c_eeprom;
 
 void eeprom_init() {
-    i2c_eeprom = I2C_DEFAULT_PORT;
-    i2c_init(I2C_DEFAULT_PORT, I2C_FREQUENCY); // 100kHz
+    i2c_eeprom = I2C_MEMORY_PORT;
+    i2c_init(I2C_MEMORY_PORT, I2C_FREQUENCY); // 100kHz
     gpio_set_function(SDA_PIN, GPIO_FUNC_I2C);
     gpio_set_function(SCL_PIN, GPIO_FUNC_I2C);
     gpio_pull_up(SDA_PIN);
@@ -19,7 +21,8 @@ void eeprom_init() {
 
 static uint8_t eeprom_get_control_byte(uint8_t mem_addr, bool read) {
     uint8_t block = mem_addr / EEPROM_BLOCK_SIZE;
-    return ((SLAVE_ADD<<3) | block) << 1 | (read ? 1 : 0);
+    printf("Control byte: %02X, Block: %d, Read: %d\n", (SLAVE_ADD << 3) , (block << 1) , (read ? 1 : 0));
+    return  ((SLAVE_ADD<<3) | (block << 1) | (read ? 1 : 0));
 }
 
 bool eeprom_write_byte(uint16_t mem_addr, uint8_t data) {
@@ -27,8 +30,11 @@ bool eeprom_write_byte(uint16_t mem_addr, uint8_t data) {
     uint8_t addr = mem_addr % EEPROM_BLOCK_SIZE;
     uint8_t buf[2] = {addr, data};
 
+    //print control
+    printf("Control byte: 0x%02X, Addr: 0x%02X, Data: 0x%02X\n", control, addr, data);
+
     int ret = i2c_write_blocking(i2c_eeprom, control, buf, 2, false);
-    sleep_ms(5); // tiempo de escritura típico
+    sleep_ms(10); // tiempo de escritura típico
     return ret == 2;
 }
 
@@ -44,7 +50,7 @@ bool eeprom_write_page(uint16_t mem_addr, const uint8_t *data, uint8_t len) {
         buf[i + 1] = data[i];
 
     int ret = i2c_write_blocking(i2c_eeprom, control, buf, len + 1, false);
-    sleep_ms(5);
+    sleep_ms(10);
     return ret == len + 1;
 }
 

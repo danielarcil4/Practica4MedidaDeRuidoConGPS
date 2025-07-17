@@ -10,7 +10,7 @@
 #define EEPROM_TOTAL_SIZE 2048
 
 // Base I2C address for block 0
-#define SLAVE_ADD 0x1010 
+#define SLAVE_ADD 0x0A 
 
 void eeprom_init();
 
