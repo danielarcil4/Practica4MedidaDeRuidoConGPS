@@ -3,6 +3,7 @@
 #include "hardware/irq.h"
 #include "pico/stdlib.h"
 #include <stdint.h>
+#include <stdio.h>
 
 #define BUTTON_PIN      14
 #define DEBOUNCE_DELAY  50  // ms
@@ -28,13 +29,15 @@ void init_button(void) {
 static void _button_callback(uint gpio, uint32_t events) {
     if (events & GPIO_IRQ_EDGE_RISE) {
         // Inicia el timer de DEBOUNCE_DELAY ms
+        gpio_set_irq_enabled_with_callback(BUTTON_PIN, GPIO_IRQ_EDGE_RISE, false, _button_callback);
         add_repeating_timer_ms(DEBOUNCE_DELAY, _button_timer_callback, NULL, &debounce_timer);
     }
 }
 
 static bool _button_timer_callback(repeating_timer_t *rt) {
-    if (!gpio_get(BUTTON_PIN)) { 
+    if (gpio_get(BUTTON_PIN)) { 
         button_valid_press = true;
+        gpio_set_irq_enabled_with_callback(BUTTON_PIN, GPIO_IRQ_EDGE_RISE, true, _button_callback);
         return false;  // Detiene el timer
     }
     return true;  // Mantiene el timer activo

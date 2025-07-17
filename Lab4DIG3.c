@@ -55,7 +55,8 @@ int main()
         //     measure_noise();
         // }
         if(button_pressed()){
-            measure_noise();
+            printf("Button pressed!\n");
+            //current_state = state_measuring();
         }
     }
 }
@@ -76,11 +77,11 @@ void initialize_all_peripherials(){
     my_adc_init(); // Initialize ADC on GPIO26 (ADC0)
 
     // Initialize the I2C interface
-    plataform_t i2c_handler = my_i2c_init(); // Initialize I2C with 40kHz frequency
+    
 }
 
 /************************************************************STATE_FUNTIONS*******************************************************************/
-
+/*
 void state_wait_gps() {
     if (gps_has_fix()) {
         set_led(GREEN_LED, ON);
@@ -133,7 +134,7 @@ void state_measuring() {
         error_flag = true;
         current_state = state_error;
         return;
-    }
+    }*/
     /**
      * TODO: Cambiar las siguientes funciones
      * Tiene que ser polling más interrupts, 
@@ -149,7 +150,7 @@ void state_measuring() {
      * ¿Qué hacer?
      * ¿Utilizar DMA? ¿Utilizar FIFO para UART?
      */
-    last_noise_db = measure_noise();
+ /*   last_noise_db = measure_noise();
     //last_location = get_gps_data();
 
     if (!gps_has_fix()) {
@@ -195,12 +196,13 @@ void state_success_write(){
     blink_led(ORANGE_LED, 1);
 }
 
-    void test_adc(){
-        adc_acc_t adc = {0};
-        measure_noise(&adc);
-        while(!adc.data_ready){
-    
-        }
-        adc.data_ready = false;
-        printf("medida del adc: %f", adc.intensidad);
+void test_adc(){
+    adc_acc_t adc = {0};
+    measure_noise(&adc);
+    while(!adc.data_ready){
+
     }
+    adc.data_ready = false;
+    printf("medida del adc: %f", adc.intensidad);
+}
+*/
