@@ -2,7 +2,6 @@
 #include "hardware/adc.h"
 #include "pico/stdlib.h"
 #include <math.h>
-#include <stdio.h>
 
 #define ADC             26
 #define ADC_CHANNEL     0 // ADC0 corresponds to GPIO26

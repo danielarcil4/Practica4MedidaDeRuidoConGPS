@@ -1,5 +1,22 @@
 #include "led.h"
 #include "hardware/gpio.h"
+#include "hardware/timer.h"
+#include "pico/time.h"
+
+#define TIMER_INTERVAL_MS 1000 // Interval for blinking in milliseconds
+
+volatile bool red_led_state = false;
+
+static repeating_timer_t blink_timer;
+
+bool blink_led_callback(repeating_timer_t *timer) {
+    static bool led_state = false;
+    uint8_t * led = (uint8_t *) timer->user_data;
+    led_state = !led_state; // Toggle the LED state
+    set_led(*led, led_state ? ON : OFF);
+    return true; // Keep the timer running
+}
+
 
 void leds_init() {
     gpio_init(YELLOW_LED);
@@ -23,13 +40,13 @@ void set_led(uint8_t led, uint8_t state) {
     }
 }
 
-
 // cambiar sleeps por timers
 void blink_led(uint8_t led, uint32_t times) {
-    for (uint32_t i = 0; i < times; i++) {
-        set_led(led, ON);
-        //sleep_ms(500); // LED on for 500 ms
-        set_led(led, OFF);
-        //sleep_ms(500); // LED off for 500 ms
-    }
+    uint8_t *ptr = &led;
+    add_repeating_timer_ms(times, blink_led_callback, ptr, &blink_timer);
+}
+
+void stop_blink_led(uint8_t led) {
+    cancel_repeating_timer(&blink_timer);
+    set_led(led, OFF); // Ensure the LED is turned off when stopping the blink
 }

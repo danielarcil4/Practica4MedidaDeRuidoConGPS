@@ -34,7 +34,7 @@ void state_success_write(void);
 
 // Variables globales
 state_func_t current_state = state_wait_gps;
-float last_noise_db = 0.0;
+char last_noise_db [5] = "0";
 gps_data_t gps_data; ///< GPS data structure to store parsed data
 bool error_flag = false;
 
@@ -51,13 +51,7 @@ int main()
     initialize_all_peripherials();
 
     while(1){
-        // if(button_pressed()){
-        //     measure_noise();
-        // }
-        if(button_pressed()){
-            printf("Button pressed!\n");
-            //current_state = state_measuring();
-        }
+        current_state();
     }
 }
 
@@ -75,13 +69,10 @@ void initialize_all_peripherials(){
 
     // Initialize the ADC
     my_adc_init(); // Initialize ADC on GPIO26 (ADC0)
-
-    // Initialize the I2C interface
-    
 }
 
 /************************************************************STATE_FUNTIONS*******************************************************************/
-/*
+
 void state_wait_gps() {
     if (gps_has_fix()) {
         set_led(GREEN_LED, ON);
@@ -90,10 +81,10 @@ void state_wait_gps() {
         red_led_state = false; // Reset red LED state
         stop_blink_led(RED_LED); // Stop blinking red LED
 
-        printf("Valid GPS data received. Latitude: %.6f %c, Longitude: %.6f %c\n",
+        /*printf("Valid GPS data received. Latitude: %.6f %c, Longitude: %.6f %c\n",
                    gps_data.latitude, gps_data.ns,
-                   gps_data.longitude, gps_data.ew);
-        return;
+                   gps_data.longitude, gps_data.ew);*/
+                   
     } else if (!red_led_state){
         //activar timers
         red_led_state = true;
@@ -104,7 +95,6 @@ void state_wait_gps() {
 
 void state_idle() {
     //set_led(GREEN_LED, ON); //Comenté esta linea porque el led verde ya se encendió en otra parte antes de pasaar a esta funcion
-
     if (!gps_has_fix()) {
         set_led(GREEN_LED, OFF);
         current_state = state_wait_gps;
@@ -121,7 +111,8 @@ void state_idle() {
     if (terminal_has_command()) {
         current_state = state_terminal;
         return;
-    }
+    }    
+    
 }
 
 void state_measuring() {
@@ -134,7 +125,7 @@ void state_measuring() {
         error_flag = true;
         current_state = state_error;
         return;
-    }*/
+    }
     /**
      * TODO: Cambiar las siguientes funciones
      * Tiene que ser polling más interrupts, 
@@ -150,21 +141,17 @@ void state_measuring() {
      * ¿Qué hacer?
      * ¿Utilizar DMA? ¿Utilizar FIFO para UART?
      */
- /*   last_noise_db = measure_noise();
-    //last_location = get_gps_data();
 
-    if (!gps_has_fix()) {
-        error_flag = true;
-        current_state = state_error;
-    } else {
-        current_state = state_saving;
-    }
+    //adc_acc_t *adc = {0}; falta un if para que no se ejecute varias veces
+    last_noise_db = measure_noise(adc);
+    last_location = gps_data; //concatenar todos los datos como char
+    current_state = state_saving;
 }
 
 void state_saving() {
     set_led(YELLOW_LED, OFF);
 
-    if (save_measurement(last_noise_db, last_location)) {
+    if (save_measurement(last_noise_db, last_location)) { // usar una bandera para saber si ya termino de guardar los datos
         blink_led(ORANGE_LED, 500);
     } else {
         error_flag = true;
@@ -179,7 +166,7 @@ void state_error() {
     set_led(YELLOW_LED, OFF);
     set_led(GREEN_LED, OFF);
     set_led(RED_LED, ON);
-    delay_ms(3000);
+    delay_ms(3000); // ejecutarlo con interrupciones
     set_led(RED_LED, OFF);
     error_flag = false;
 
@@ -205,4 +192,3 @@ void test_adc(){
     adc.data_ready = false;
     printf("medida del adc: %f", adc.intensidad);
 }
-*/
