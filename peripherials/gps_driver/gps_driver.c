@@ -28,6 +28,7 @@ void on_uart_rx() {
             // End of line, process the line
             if (rx_buffer_index > 0) {
                 gps_buffer[rx_buffer_index] = '\0'; // Null-terminate the string
+                //printf("Received GPS data: %s\n", gps_buffer);
                 get_gps_data(); // Process the GPS data
                 rx_buffer_index = 0; // Reset index for next line
                 chars_rxed++;

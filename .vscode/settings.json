@@ -50,6 +50,17 @@
         "stdbool.h": "c",
         "gpio.h": "c",
         "uart.h": "c",
-        "power.h": "c"
+        "power.h": "c",
+        "array": "c",
+        "__tuple": "c",
+        "filesystem": "c",
+        "bitset": "c",
+        "format": "c",
+        "chrono": "c",
+        "map": "c",
+        "set": "c",
+        "unordered_map": "c",
+        "unordered_set": "c",
+        "memory_driver.h": "c"
     }
 }

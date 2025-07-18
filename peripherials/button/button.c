@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define BUTTON_PIN      14
+#define BUTTON_PIN      10
 #define DEBOUNCE_DELAY  50  // ms
 
 // Prototipo de la función de callback

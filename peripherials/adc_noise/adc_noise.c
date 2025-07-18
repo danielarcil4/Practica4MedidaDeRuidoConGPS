@@ -26,6 +26,7 @@ static bool sampling_callback(repeating_timer_t *rt) {
     // Retorna true para seguir, false para detener
     if(adc->count == NUM_SAMPLING){
         finish_measurement(adc);
+        //adc->taking_data = false;
         adc->data_ready = true;
         return false;
     }

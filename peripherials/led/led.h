@@ -2,10 +2,10 @@
 #define __LED_H__
 #include <stdint.h>
 
-#define YELLOW_LED      10
-#define GREEN_LED       11
-#define ORANGE_LED      12
-#define RED_LED         13
+#define YELLOW_LED      19
+#define GREEN_LED       20
+#define ORANGE_LED      18
+#define RED_LED         17
 
 #define ON              1
 #define OFF             0

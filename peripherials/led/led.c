@@ -5,7 +5,7 @@
 
 #define TIMER_INTERVAL_MS 1000 // Interval for blinking in milliseconds
 
-volatile bool red_led_state = false;
+//volatile bool red_led_state = false;
 
 static repeating_timer_t blink_timer;
 
