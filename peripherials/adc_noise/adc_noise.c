@@ -3,15 +3,20 @@
 #include "pico/stdlib.h"
 #include <math.h>
 
-#define ADC             26
-#define ADC_CHANNEL     0 // ADC0 corresponds to GPIO26
-#define TIME_TO_SAMPLE  100
-#define NUM_SAMPLING    10
+/**
+ * @file adc_noise.c
+ * @brief Implementation of ADC noise measurement functions.
+ */
 
-const float conversion_factor = 3.3f / (1 << 12);
+#define ADC             26 ///< ADC0 corresponds to GPIO26
+#define ADC_CHANNEL     0 ///< ADC channel for GPIO26
+#define TIME_TO_SAMPLE  100 ///< Time in milliseconds to take a sample
+#define NUM_SAMPLING    10 ///< Number of samples to take for averaging
 
-static inline void finish_measurement(adc_acc_t *adc);
-static repeating_timer_t sampling_timer;
+const float conversion_factor = 3.3f / (1 << 12); ///< Conversion factor for 12-bit ADC
+
+static inline void finish_measurement(adc_acc_t *adc); ///< Forward declaration of finish_measurement function 
+static repeating_timer_t sampling_timer;  ///< Timer for sampling ADC values
 
 void my_adc_init() {
     adc_init();

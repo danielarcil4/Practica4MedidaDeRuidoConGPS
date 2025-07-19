@@ -1,3 +1,15 @@
+/**
+ * @file Lab4DIG3.c
+ * @brief Main file for the Lab 4 project.
+ * This file contains the main function and state machine for the project.
+ * It initializes all peripherals and handles the main loop for measuring noise with GPS.
+ * \author Santiago Vargas, Santiago Arcila
+ * \version 1.0
+ * \date 2025-07-19
+ * \TODO: Implement error handling and improve state management.
+ */
+
+
 #include <stdio.h>
 #include <pico/stdio.h>
 #include <pico/stdlib.h>
@@ -11,27 +23,71 @@
 #include "peripherials/memory_driver/memory_driver.h"
 
 #include <string.h>
-// UART defines for GPS
-#define UART_ID uart1
 
-// Use pins 4 and 5 for UART1
-// Pins can be changed, see the GPIO function select table in the datasheet for information on GPIO assignments
-#define UART_TX_PIN 4
-#define UART_RX_PIN 5
+#define UART_ID uart1 ///< UART instance to use
+#define UART_TX_PIN 4 ///< UART TX pin
+#define UART_RX_PIN 5 ///< UART RX pin
 
+/**
+ * @brief Initializes all peripherals used in the project.
+ * This function sets up the terminal, GPS, button, LEDs, ADC, and EEPROM.
+ */
 void initialize_all_peripherials(void);
 
-void button_isr_gpio(void);
+typedef void(*state_func_t)(void); ///< Type definition for state functions
 
-// Function prototypes for state functions
-typedef void(*state_func_t)(void);
-
+/**
+ * @brief State idle function.
+ * This function is called when the system is idle, waiting for user input or GPS fix.
+ * It checks for button presses and terminal commands to transition to other states.
+ * Turns on the green LED when in idle state.
+ * If a GPS fix is not available, it transitions to the wait GPS state.
+ */
 void state_idle(void);
+
+/**
+ * @brief State measuring function.
+ * This function is called when the system is measuring noise levels and GPS data.
+ * It handles the ADC measurements and prepares data for saving.
+ * Turns on the yellow LED while measuring.
+ * If an error occurs, it transitions to the error state.
+ */
 void state_measuring(void);
+
+/**
+ * @brief State saving function.
+ * This function is called when the system is saving the measured data.
+ */
+
 void state_saving(void);
+
+/**
+ * @brief State error function.
+ * This function is called when an error occurs in the system.
+ * It handles the error state by turning on the red LED and waiting for a GPS fix.
+ */
 void state_error(void);
+
+/**
+ * @brief State wait GPS function.
+ * This function is called when the system is waiting for a GPS fix.
+ * It turns on the red LED to indicate waiting and checks for GPS fix status.
+ */
 void state_wait_gps(void);
+
+/**
+ * @brief State terminal function.
+ * This function is called when the system is in terminal mode.
+ * It handles terminal commands and transitions back to idle state if a GPS fix is available.
+ */
 void state_terminal(void);
+
+/**
+ * @brief State success write function.
+ * This function is called when data is successfully written to memory.
+ * It blinks the orange LED briefly to indicate success.
+ * This function is called after a successful write operation.
+ */
 void state_success_write(void);
 
 void data_to_string();
@@ -39,13 +95,13 @@ void test_adc(void);
 void test_memory(void);
 
 // Variables globales
-state_func_t current_state = state_wait_gps;
-bool error_flag = false;
+state_func_t current_state = state_wait_gps;///< Pointer to the current state function
+bool error_flag = false; ///< Flag to indicate if an error has occurred
 
-bool red_led_state = false;
+bool red_led_state = false; ///< Flag to indicate if the red LED is blinking
 char datos [30]={0};
-adc_acc_t adc = {0};
-gps_data_t gps_data = {0};
+adc_acc_t adc = {0}; ///< ADC data structure for noise measurement
+gps_data_t gps_data = {0}; ///< GPS data structure to hold GPS information
 
 int main()
 {
@@ -61,9 +117,9 @@ int main()
     //eeprom_set_index(0);
     while(1){
         //test_adc();
-        //current_state();
+        current_state();
 
-        test_memory();
+        //test_memory();
 
     }
 }
@@ -147,10 +203,10 @@ void state_idle() {
         return;
     }
 
-    // if (terminal_has_command()) {
-    //     current_state = state_terminal;
-    //     return;
-    // }    
+    if (terminal_has_command()) {
+        current_state = state_terminal;
+        return;
+    }    
     
 }
 

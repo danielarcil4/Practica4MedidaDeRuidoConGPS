@@ -4,14 +4,18 @@
 #include <stdio.h>
 #include <string.h>
 
-#define I2C_MEMORY_PORT i2c0
-#define SDA_PIN 14
-#define SCL_PIN 15
-#define I2C_FREQUENCY 100000 // 100kHz
+/**
+ * @file memory_driver.c
+ * @brief Implementation of EEPROM memory driver functions.
+ * This file contains the implementation of functions to read and write data to the EEPROM memory.
+ */
 
+#define I2C_MEMORY_PORT i2c0 ///< I2C port for EEPROM
+#define SDA_PIN 14 ///< GPIO pin for SDA
+#define SCL_PIN 15 ///< GPIO pin for SCL 
+#define I2C_FREQUENCY 100000 ///< I2C frequency in Hz 
 
-
-static i2c_inst_t *i2c_eeprom;
+static i2c_inst_t *i2c_eeprom; ///< I2C instance for EEPROM
 
 void eeprom_init() {
     i2c_eeprom = I2C_MEMORY_PORT;

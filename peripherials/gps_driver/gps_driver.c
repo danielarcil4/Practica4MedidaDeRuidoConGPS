@@ -8,6 +8,11 @@
 #include "hardware/uart.h"
 
 /**
+ * \file gps_driver.c
+ */
+
+
+/**
  * Versión 1: Con interrupciones
  * Se "deshabilita" el FIFO, se lee dato caracter a caracter
  * Cada que llegue al caracter de fin de línea, se procesa la línea completa
@@ -15,7 +20,7 @@
  */
 // RX interrupt handler
 uart_inst_t *UART_ID = uart1; ///< UART instance to use for GPS communication
-static int chars_rxed = 0;
+static int chars_rxed = 0; ///< Counter for received characters
 
 
 static char gps_buffer[GPS_BUFFER_SIZE]; ///< Buffer to store incoming GPS data

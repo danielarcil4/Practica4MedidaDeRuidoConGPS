@@ -5,18 +5,33 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define BUTTON_PIN      10
-#define DEBOUNCE_DELAY  50  // ms
+/**
+ * @file button.c
+ * @brief Implementation of button peripheral functions.
+ */
 
-// Prototipo de la función de callback
+#define BUTTON_PIN      10 ///< GPIO pin for the button
+#define DEBOUNCE_DELAY  50  ///< Debounce delay in milliseconds
+
+/**
+ * @brief Initializes the button peripheral.
+ * This function sets up the GPIO pin for the button and configures the interrupt.
+ * It also initializes a timer for debouncing the button press.
+ */
 static void _button_callback(uint gpio, uint32_t events);
+
+/**
+ * @brief Timer callback function for debouncing the button press.
+ * This function is called when the debounce timer expires.
+ * It checks the button state and sets the valid press flag if the button is still pressed.
+ * @param rt Pointer to the repeating timer structure.
+ */
 static bool _button_timer_callback(repeating_timer_t *rt);
 
-// Estado interno del botón
-static repeating_timer_t debounce_timer;
-static volatile bool debounce_timer_active = false;
-static volatile bool button_irq_flag = false;     // IRQ 
-static volatile bool button_valid_press = false;  // flanco confirmado
+static repeating_timer_t debounce_timer; ///< Timer for debouncing the button press
+static volatile bool debounce_timer_active = false; ///< Flag to indicate if the debounce timer is active
+static volatile bool button_irq_flag = false;     ///< Flag to indicate if the button interrupt has occurred
+static volatile bool button_valid_press = false;  ///< Flag to indicate a valid button press
 
 void init_button(void) {
     gpio_init(BUTTON_PIN);

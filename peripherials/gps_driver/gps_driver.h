@@ -4,7 +4,6 @@
  * \author SJVH
  * \date
  * \version
- * \todo Add GPS driver functionality
  */
 
 
